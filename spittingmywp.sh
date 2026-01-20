@@ -8,6 +8,7 @@ source .env
 #jubi=$(rss2json 'https://jubi.id/feed'|jq -r .''|gron|grep -E 'items\[[0-9]{1,}\]\.link\ =')
 #rss2json 'https://jubi.id/feed' > jubi.json
 jubi=$(cat ./jubi.json|gron|grep -E '\.items\[[0-9]{1,}\]\.'|grep -E '\.title|\.guid|\.link|\.published|\.content'|gron -u)
+jubiTitle_=$(jq -r '.' ./jubi.json|grep -m1 -i -E '"title"'|awk -F'"' '{print $4}')
 #echo $AI_PROMPT
 jq -c '.items[]' ./jubi.json|while read -r item
 do
@@ -22,5 +23,5 @@ do
 	echo $link_
 	echo $published_
 	echo $photo_
-	echo "Berita:[$content_] . Sumber:[$link_ - $published_]"|ollama run gemma3:4b "$AI_PROMPT" 2>/dev/null|tee -a ./tmps/news-generated-$RANDOM.txt
+	echo "Judul:[$title_] Berita:[$content_] . Sumber:[$jubiTitle_ - $published_]"|ollama run gemma3:4b "$AI_PROMPT" 2>/dev/null|tee -a ./tmps/news-generated-$RANDOM.txt
 done
