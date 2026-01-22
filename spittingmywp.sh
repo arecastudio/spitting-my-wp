@@ -29,3 +29,10 @@ do
 	echo $photo_
 	echo "Judul:[$title_] Berita:[$content_] . Sumber:[$jubiTitle_ - $published_]"|ollama run gemma3:4b "$AI_PROMPT" 2>/dev/null|tee -a ./tmps/scripts/newsgenerated_$filename_.txt
 done
+
+
+find ./tmps/scripts -maxdepth 1 -type f -iname 'newsgenerated*.txt' -print|while read -r naskah
+do 
+	idnaskah=$(echo $naskah|awk -F'\/' '{print $NF}'|sed 's/newsgenerated\_//;s/\.txt$//')
+	sed 's/\*//g' $naskah|piper  -m $MODEL_NEWS_ID -f ./tmps/audios/$idnaskah.wav --sentence-silence 0.1 --length_scale 0.8
+done
